@@ -1,11 +1,10 @@
 "use client"
 
-import { Center, Environment, Float, OrbitControls, PerspectiveCamera, Text3D } from '@react-three/drei';
+import { Center, Environment, Float, OrbitControls, PerspectiveCamera, Text3D, useProgress } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, Glitch, Noise, Scanline, Vignette } from '@react-three/postprocessing';
 import { BlendFunction, GlitchMode } from 'postprocessing';
-import { Suspense, useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
+import { Suspense, useRef } from 'react';
 import { Color, Group, MeshStandardMaterial, Vector2 } from 'three';
 import { Particles } from './Particles';
 
@@ -241,7 +240,9 @@ const InfoPanel = () => {
 };
 
 // Loading component
-const LoadingScreen = ({ progress }: { progress: number }) => {
+const LoadingScreen = () => {
+  const { progress } = useProgress();
+  
   return (
     <group position={[0, 0, 0]}>
       {/* Loading text */}
@@ -298,33 +299,10 @@ const LoadingScreen = ({ progress }: { progress: number }) => {
 
 // Main Scene component
 export const Scene = () => {
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [assetsLoaded, setAssetsLoaded] = useState(false);
-  const loadingManager = useRef<THREE.LoadingManager>(new THREE.LoadingManager());
-
+  const { active } = useProgress();
   const handleClick = () => {
     window.open('https://x.com/FradSer/status/1897942027305951412', '_blank');
   };
-
-  useEffect(() => {
-    // 创建加载管理器
-    loadingManager.current = new THREE.LoadingManager(
-      // 加载完成回调
-      () => {
-        setAssetsLoaded(true);
-        setLoadingProgress(100);
-      },
-      // 加载进度回调
-      (url: string, itemsLoaded: number, itemsTotal: number) => {
-        const progress = (itemsLoaded / itemsTotal) * 100;
-        setLoadingProgress(progress);
-      },
-      // 加载错误回调
-      (url: string) => {
-        console.error('Error loading:', url);
-      }
-    );
-  }, []);
 
   return (
     <div 
@@ -351,7 +329,7 @@ export const Scene = () => {
         <Suspense fallback={
           <group>
             <Environment preset="night" />
-            <LoadingScreen progress={loadingProgress} />
+            <LoadingScreen />
             <EffectComposer>
               <Bloom 
                 luminanceThreshold={0.01}
@@ -380,7 +358,7 @@ export const Scene = () => {
             background={false}
             blur={0.8}
           />
-          {assetsLoaded && (
+          {!active && (
             <>
               <CityBackground />
               <Title />
