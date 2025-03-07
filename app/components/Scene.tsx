@@ -324,10 +324,6 @@ export const Scene = () => {
         console.error('Error loading:', url);
       }
     );
-
-    // 使用加载管理器加载环境贴图
-    const textureLoader = new THREE.TextureLoader(loadingManager.current);
-    textureLoader.load('/environment/machine_shop.hdr');
   }, []);
 
   return (
@@ -379,7 +375,11 @@ export const Scene = () => {
             </EffectComposer>
           </group>
         }>
-          <Environment preset="night" />
+          <Environment 
+            files="/environment/machine_shop.hdr"
+            background={false}
+            blur={0.8}
+          />
           {assetsLoaded && (
             <>
               <CityBackground />
