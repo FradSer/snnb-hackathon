@@ -85,7 +85,7 @@ export const InfoPanel = () => {
       {eventDetails.map((detail, index) => (
         <Text3D
           key={detail.label}
-          font="/fonts/helvetiker_bold.typeface.json"
+          font="/fonts/PressStart2P.typeface.json"
           position={[-8, 2 - index * 2, 0]}
           size={0.5}
           height={0.1}

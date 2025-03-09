@@ -67,7 +67,7 @@ export const LoadingScreen = () => {
     return (
       <group position={[0, 0, 0]}>
         <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
+          font="/fonts/PressStart2P.typeface.json"
           position={[-4, 0, 0]}
           size={1.5}
           height={0.2}
@@ -84,7 +84,7 @@ export const LoadingScreen = () => {
       {/* Main loading text */}
       <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
         <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
+          font="/fonts/PressStart2P.typeface.json"
           position={[-4, 2, 0]}
           size={1.5}
           height={0.2}
@@ -100,15 +100,21 @@ export const LoadingScreen = () => {
 
       {/* Display currently loading item name */}
       {item && (
-        <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
-          position={[-7, -3, 0]}
-          size={0.4}
-          height={0.05}
-          material={SECONDARY_GLOW_MATERIAL}
-        >
-          {`${item}`}
-        </Text3D>
+        <Float speed={2.5} rotationIntensity={0.1} floatIntensity={0.2}>
+          <Text3D
+            font="/fonts/PressStart2P.typeface.json"
+            position={[0, 0, 0]}
+            size={0.3}
+            height={0.05}
+            curveSegments={4}
+            bevelEnabled
+            bevelThickness={0.01}
+            bevelSize={0.01}
+            material={SECONDARY_GLOW_MATERIAL}
+          >
+            {item.toUpperCase()}
+          </Text3D>
+        </Float>
       )}
 
       {/* Progress bar background */}
@@ -164,7 +170,7 @@ export const LoadingScreen = () => {
       {/* Progress percentage display */}
       <Float speed={3} rotationIntensity={0.1} floatIntensity={0.3}>
         <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
+          font="/fonts/PressStart2P.typeface.json"
           position={[-1, -2, 0]}
           size={0.8}
           height={0.1}

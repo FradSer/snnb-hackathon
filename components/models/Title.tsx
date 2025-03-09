@@ -46,7 +46,7 @@ export const Title = () => {
         <Center top>
           <group ref={primaryTextRef}>
             <Text3D
-              font="/fonts/helvetiker_bold.typeface.json"
+              font="/fonts/PressStart2P.typeface.json"
               size={4}
               height={0.8}
               curveSegments={16}
@@ -68,7 +68,7 @@ export const Title = () => {
         <Center>
           <group ref={secondaryTextRef}>
             <Text3D
-              font="/fonts/helvetiker_bold.typeface.json"
+              font="/fonts/PressStart2P.typeface.json"
               size={2}
               height={0.3}
               curveSegments={12}

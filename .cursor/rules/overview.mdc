@@ -1,0 +1,115 @@
+---
+description: Project overview and coding standards
+globs: 
+alwaysApply: true
+---
+# SNNB Hackathon Project Overview
+
+## Project Description
+A cyberpunk-themed 3D experience built with Next.js 15.2.1, React 19, and React Three Fiber (R3F). Utilizes Three.js for 3D rendering and modern web development practices.
+
+## Runtime & Package Management
+- **Runtime**: Bun
+- **Package Manager**: Bun (with `bun.lock`)
+- **Node.js Compatibility**: Maintained through `package.json`
+
+## Technology Stack
+- **Framework**: Next.js 15.2.1 (App Router)
+- **Language**: TypeScript 5.x
+- **UI Library**: React 19
+- **3D Rendering**: 
+  - Three.js 0.174.0
+  - React Three Fiber 9.0.4
+  - React Three Drei 10.0.4
+  - React Spring Three 9.7.5
+- **Styling**: TailwindCSS 4
+- **Tooling**:
+  - ESLint 9
+  - Turbopack (dev builds)
+
+## Project Structure
+```
+snnb-hackathon/
+├── app/                     # Next.js App Router
+│   ├── layout.tsx           # Root layout
+│   ├── page.tsx             # Home page
+│   ├── globals.css          # Global styles
+│   ├── favicon.ico          # Favicon
+├── components/              # All components
+│   ├── ui/                  # UI components
+│   ├── scenes/              # 3D scene components
+│   ├── models/              # 3D model components
+│   ├── effects/             # Post-processing effects
+│   └── environment/         # Environment components
+├── hooks/                   # Custom React hooks
+├── lib/                     # Utility functions
+├── constants/               # Project constants
+└── public/                  # Static assets
+```
+
+## Coding Standards
+
+### 1. TypeScript Practices
+- Strict mode only (`strict`, `noImplicitAny`, `strictNullChecks`)
+- No `any` types allowed
+- `interface` for APIs, `type` for utils
+- Type exports must be explicit
+- Internal types can be inferred
+
+### 2. React Patterns
+- Functional components only
+- Proper prop typing
+- Effective hooks usage
+- Component composition
+- Server Components where possible
+- Client Components clearly marked with "use client"
+
+### 3. Naming Conventions
+- Components: `PascalCase.tsx`
+- Utilities: `camelCase.ts`
+- Pages: `kebab-case.tsx`
+- Tests: `*.test.ts` / `*.spec.ts`
+
+### 4. Code Style
+- 2-space indentation
+- 80 character line limit
+- Semicolons required
+- Single quotes preferred
+- Sorted imports
+
+### 5. Git Workflow
+- Conventional commits
+- Feature branch strategy
+- PR review process
+- Squash merge only
+
+### 6. Performance
+- Code splitting
+- Image optimization
+- Three.js objects proper disposal
+- Server Components usage
+- Asset optimization
+
+### 7. Testing
+- Unit tests for utils
+- Integration for components
+- 80%+ coverage
+- Test descriptions
+
+### 8. Documentation
+- JSDoc for complex logic
+- Component READMEs
+- Code comments explaining purpose and functionality
+- Live examples
+
+## Development Workflow
+1. `bun run dev` - Local dev with Turbopack
+2. `bun run lint` - Pre-commit
+3. `bun run build` - Production build
+4. `bun run start` - Run production build
+
+## Build Commands
+- Dev: `bun run dev`
+- Build: `bun run build`
+- Start: `bun run start`
+- Lint: `bun run lint` 
