@@ -1,81 +1,78 @@
-# SNNB Hackathon Project
+# SNNB HACKATHON - A Cyberpunk Experience
 
-A modern web application built with Next.js for the SNNB Hackathon.
-
-## Tech Stack
-
-- **Framework:** [Next.js](https://nextjs.org) 14 (App Router)
-- **Styling:** Tailwind CSS
-- **Font:** [Geist](https://vercel.com/font)
-- **Deployment:** Vercel
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18.17.0 or later
-- npm, yarn, or pnpm
-
-### Development
-
-1. Clone the repository
-```bash
-git clone [your-repo-url]
-cd snnb-hackathon
-```
-
-2. Install dependencies
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-3. Start the development server
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A Next.js and React Three Fiber (R3F) application that showcases a cyberpunk-themed 3D experience.
 
 ## Project Structure
 
+This project follows best practices for organizing Next.js and React Three Fiber code:
+
 ```
-snnb-hackathon/
-├── app/                # Next.js app directory
-├── components/         # React components
-├── public/            # Static assets
-├── styles/           # Global styles
-└── ...
+/
+├── app/                     # Next.js App Router
+│   ├── layout.tsx           # Root layout
+│   ├── page.tsx             # Home page
+│   ├── globals.css          # Global styles
+│   ├── favicon.ico          # Favicon
+├── components/              # All components
+│   ├── layout/              # Layout components
+│   ├── ui/                  # UI components
+│   ├── scenes/              # 3D scene components
+│   ├── models/              # 3D model components
+│   ├── effects/             # Post-processing effects
+│   └── environment/         # Environment components
+├── hooks/                   # Custom React hooks
+├── lib/                     # Utility functions
+├── constants/               # Project constants
+└── public/                  # Static assets
+    ├── environment/         # Environment maps
+    ├── music/               # Audio files
+    ├── textures/            # Texture files
+    └── fonts/               # Font files
 ```
 
-## Development Guidelines
+## Best Practices
 
-- The application uses the Next.js App Router
-- Components are organized in the `components` directory
-- Pages are defined in the `app` directory following Next.js 14 conventions
+This project adheres to the following best practices:
 
-## Deployment
+1. **Component Organization**: Components are organized by functionality rather than by technology (DOM vs Canvas).
 
-The project is configured for deployment on [Vercel](https://vercel.com). For deployment:
+2. **Code Separation**: Logic is separated into appropriate directories (hooks, utils, constants) for better maintainability.
 
-1. Push your changes to the main branch
-2. Vercel will automatically deploy your updates
+3. **Type Safety**: TypeScript is used throughout the project for better type safety and developer experience.
 
-For other deployment options, refer to the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
+4. **Performance Optimization**: 
+   - Server Components are used where possible
+   - Client Components are clearly marked with "use client"
+   - Assets are properly optimized
+   - Three.js objects are properly disposed
 
-## Contributing
+5. **Documentation**: Code is well-documented with comments explaining the purpose and functionality.
 
-1. Create a new branch for your feature
-2. Make your changes
-3. Submit a pull request
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start the production server
+npm start
+```
+
+## Technologies
+
+- Next.js
+- React Three Fiber (R3F)
+- React Three Drei
+- Three.js
+- TypeScript
+- TailwindCSS
 
 ## License
 
-[MIT](LICENSE)
+MIT
