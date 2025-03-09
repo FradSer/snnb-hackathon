@@ -4,7 +4,7 @@ import { Center, Environment, Float, OrbitControls, PerspectiveCamera, Text3D, u
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, Glitch, Noise, Scanline, Vignette } from '@react-three/postprocessing';
 import { BlendFunction, GlitchMode } from 'postprocessing';
-import { Suspense, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Color, Group, MeshStandardMaterial, Vector2 } from 'three';
 import { Particles } from './Particles';
 
@@ -239,32 +239,103 @@ const InfoPanel = () => {
   );
 };
 
-// Loading component
+// Enhanced loading component with realistic progress
 const LoadingScreen = () => {
-  const { progress } = useProgress();
+  const { progress, item, errors, active } = useProgress();
+  const progressRef = useRef<Group>(null);
+  const [initialRender, setInitialRender] = useState(true);
+  
+  // 打印加载状态信息，用于调试，添加更多详细信息
+  useEffect(() => {
+    console.log(`Loading status: progress=${progress}, active=${active}, item=${item || 'none'}, allErrors=${JSON.stringify(errors)}`);
+  }, [progress, active, item, errors]);
+  
+  // 在第一次渲染后添加延迟切换，确保组件有足够时间初始化
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInitialRender(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Animate the progress bar
+  useFrame((state) => {
+    if (progressRef.current) {
+      // Add subtle floating animation
+      progressRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 2) * 0.1;
+      
+      // Scale effect based on loading progress - 确保进度条有初始宽度
+      const normalizedProgress = progress < 5 ? 5 : progress; // 提供最小显示宽度
+      progressRef.current.scale.x = Math.max(0.05, normalizedProgress / 100);
+    }
+  });
+  
+  // 简化初始渲染
+  if (initialRender) {
+    return (
+      <group position={[0, 0, 0]}>
+        <Text3D
+          font="/fonts/helvetiker_bold.typeface.json"
+          position={[-4, 0, 0]}
+          size={1.5}
+          height={0.2}
+          material={glowMaterial}
+        >
+          LOADING...
+        </Text3D>
+      </group>
+    );
+  }
   
   return (
     <group position={[0, 0, 0]}>
       {/* Loading text */}
-      <Text3D
-        font="/fonts/helvetiker_bold.typeface.json"
-        position={[-4, 2, 0]}
-        size={1.5}
-        height={0.2}
-        curveSegments={12}
-        bevelEnabled
-        bevelThickness={0.05}
-        bevelSize={0.01}
-        material={glowMaterial}
-      >
-        LOADING
-      </Text3D>
+      <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
+        <Text3D
+          font="/fonts/helvetiker_bold.typeface.json"
+          position={[-4, 2, 0]}
+          size={1.5}
+          height={0.2}
+          curveSegments={12}
+          bevelEnabled
+          bevelThickness={0.05}
+          bevelSize={0.01}
+          material={glowMaterial}
+        >
+          LOADING
+        </Text3D>
+      </Float>
+
+      {/* Currently loading item name */}
+      {item && (
+        <Text3D
+          font="/fonts/helvetiker_bold.typeface.json"
+          position={[-7, -3, 0]}
+          size={0.4}
+          height={0.05}
+          material={secondaryGlowMaterial}
+        >
+          {`${item}`}
+        </Text3D>
+      )}
 
       {/* Progress bar background */}
-      <mesh position={[0, 0, 0]}>
-        <planeGeometry args={[8, 0.4]} />
+      <mesh position={[0, 0, -0.1]}>
+        <boxGeometry args={[8.2, 0.6, 0.1]} />
         <meshStandardMaterial 
           color={new Color(0x000000)}
+          emissive={neonPurple}
+          emissiveIntensity={0.3}
+          transparent
+          opacity={0.7}
+        />
+      </mesh>
+
+      {/* Progress bar track */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[8, 0.4, 0.1]} />
+        <meshStandardMaterial 
+          color={new Color(0x111111)}
           emissive={neonPurple}
           emissiveIntensity={0.2}
           transparent
@@ -272,34 +343,76 @@ const LoadingScreen = () => {
         />
       </mesh>
 
-      {/* Progress bar fill */}
-      <mesh position={[-4 + (progress / 100 * 4), 0, 0.1]} scale={[progress / 100, 1, 1]}>
-        <planeGeometry args={[8, 0.4]} />
-        <meshStandardMaterial 
-          color={neonPink}
-          emissive={neonPink}
-          emissiveIntensity={1}
-          toneMapped={false}
-        />
-      </mesh>
+      {/* Dynamic progress bar fill */}
+      <group ref={progressRef} position={[-4, 0, 0.1]}>
+        <mesh scale={[1, 1, 1]}>
+          <boxGeometry args={[8, 0.4, 0.2]} />
+          <meshStandardMaterial 
+            color={neonPink}
+            emissive={neonPink}
+            emissiveIntensity={1.5}
+            toneMapped={false}
+          />
+        </mesh>
+        
+        {/* Highlight on the progress bar */}
+        <mesh position={[4, 0, 0.1]} scale={[0.1, 0.8, 1]}>
+          <boxGeometry args={[1, 0.4, 0.1]} />
+          <meshStandardMaterial 
+            color={new Color(0xffffff)}
+            emissive={new Color(0xffffff)}
+            emissiveIntensity={2}
+            transparent
+            opacity={0.8}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
 
       {/* Progress percentage */}
-      <Text3D
-        font="/fonts/helvetiker_bold.typeface.json"
-        position={[-1, -2, 0]}
-        size={0.8}
-        height={0.1}
-        material={secondaryGlowMaterial}
-      >
-        {`${Math.round(progress)}%`}
-      </Text3D>
+      <Float speed={3} rotationIntensity={0.1} floatIntensity={0.3}>
+        <Text3D
+          font="/fonts/helvetiker_bold.typeface.json"
+          position={[-1, -2, 0]}
+          size={0.8}
+          height={0.1}
+          material={secondaryGlowMaterial}
+        >
+          {`${Math.round(progress)}%`}
+        </Text3D>
+      </Float>
     </group>
   );
 };
 
+// 预加载组件，用于确保资源在显示加载进度条前就开始加载
+const Preloader = () => {
+  // 初始化加载状态
+  useProgress();
+  
+  return null;
+};
+
 // Main Scene component
 export const Scene = () => {
-  const { active } = useProgress();
+  const { active, progress } = useProgress();
+  const [loading, setLoading] = useState(true);
+  
+  // 更新加载状态
+  useEffect(() => {
+    console.log(`Main scene loading status: progress=${progress}, active=${active}`);
+    
+    // 只有在加载完成且进度到达100%时才更新状态
+    if (!active && progress >= 100 && loading) {
+      // 添加延迟，确保加载内容有时间完全显示
+      const timer = setTimeout(() => {
+        console.log('Loading complete, switching to main scene');
+        setLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [active, progress, loading]);
+
   const handleClick = () => {
     window.open('https://x.com/FradSer/status/1897942027305951412', '_blank');
   };
@@ -309,9 +422,32 @@ export const Scene = () => {
       className="h-screen w-full cursor-pointer" 
       onClick={handleClick}
       title="Click to view on X/Twitter"
+      style={{ background: "#000" }} // 确保背景是黑色，避免白屏
     >
-      <Canvas shadows>
+      {/* 立即显示初始加载指示器 - 只在加载中显示 */}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black">
+          <div className="text-pink-500 text-2xl font-bold animate-pulse">
+            LOADING...
+          </div>
+        </div>
+      )}
+      
+      <Canvas 
+        shadows
+        gl={{ 
+          powerPreference: 'high-performance',
+          alpha: false
+        }}
+        style={{ 
+          opacity: loading ? 0.3 : 1,
+          transition: 'opacity 0.5s ease-in' 
+        }}
+      >
         <color attach="background" args={['#000000']} />
+        
+        {/* 预加载组件，确保资源在显示加载进度条前开始加载 */}
+        <Preloader />
         
         <PerspectiveCamera makeDefault position={[0, 15, 20]} fov={50} />
         <OrbitControls 
@@ -326,97 +462,78 @@ export const Scene = () => {
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
         <pointLight position={[-10, -10, -10]} intensity={0.5} />
         
-        <Suspense fallback={
-          <group>
-            <Environment preset="night" />
-            <LoadingScreen />
-            <EffectComposer>
-              <Bloom 
-                luminanceThreshold={0.01}
-                luminanceSmoothing={0.9}
-                intensity={2.0}
-                levels={9}
-                mipmapBlur
-              />
-              <ChromaticAberration 
-                offset={[0.002, 0.005]}
-                blendFunction={BlendFunction.NORMAL}
-              />
-              <Glitch
-                delay={new Vector2(5, 10)}
-                duration={new Vector2(0.2, 0.4)}
-                strength={new Vector2(0.02, 0.04)}
-                mode={GlitchMode.CONSTANT_MILD}
-                active
-                ratio={0.2}
-              />
-            </EffectComposer>
-          </group>
-        }>
+        {/* 加载界面始终显示，以便显示正确的加载进度 */}
+        <Suspense fallback={<LoadingScreen />}>
+          {/* 先加载重要资源，触发加载进度 */}
           <Environment 
             files="/environment/machine_shop.hdr"
             background={false}
             blur={0.8}
           />
-          {!active && (
+          
+          {/* 核心场景内容，只在加载完成后显示 */}
+          {!loading && (
             <>
               <CityBackground />
               <Title />
               <InfoPanel />
               <Particles count={2000} />
+              
+              {/* Post-processing effects - 保留所有原始效果 */}
+              <EffectComposer>
+                {/* Bloom effect for the neon glow */}
+                <Bloom 
+                  luminanceThreshold={0.01}
+                  luminanceSmoothing={0.9}
+                  intensity={2.0}
+                  levels={9}
+                  mipmapBlur
+                />
+                
+                {/* Color fringing effect */}
+                <ChromaticAberration 
+                  offset={[0.002, 0.005]} 
+                  blendFunction={BlendFunction.NORMAL}
+                  radialModulation={true}
+                  modulationOffset={0.3}
+                />
+                
+                {/* Subtle noise for film grain */}
+                <Noise 
+                  opacity={0.15} 
+                  blendFunction={BlendFunction.OVERLAY}
+                />
+                
+                {/* Vignette darkens the corners */}
+                <Vignette
+                  offset={0.3}
+                  darkness={0.7}
+                  blendFunction={BlendFunction.NORMAL}
+                />
+                
+                {/* Scanlines for CRT effect */}
+                <Scanline
+                  density={2.5}
+                  opacity={0.05}
+                  blendFunction={BlendFunction.OVERLAY}
+                />
+                
+                {/* Occasional glitch effect */}
+                <Glitch
+                  delay={new Vector2(2, 5)}
+                  duration={new Vector2(0.2, 0.4)}
+                  strength={new Vector2(0.1, 0.4)}
+                  mode={GlitchMode.SPORADIC}
+                  active
+                  ratio={0.6}
+                />
+              </EffectComposer>
             </>
           )}
-          
-          {/* Post-processing effects */}
-          <EffectComposer>
-            {/* Bloom effect for the neon glow */}
-            <Bloom 
-              luminanceThreshold={0.01}
-              luminanceSmoothing={0.9}
-              intensity={2.0}
-              levels={9}
-              mipmapBlur
-            />
-            
-            {/* Color fringing effect */}
-            <ChromaticAberration 
-              offset={[0.002, 0.005]} 
-              blendFunction={BlendFunction.NORMAL}
-              radialModulation={true}
-              modulationOffset={0.3}
-            />
-            
-            {/* Subtle noise for film grain */}
-            <Noise 
-              opacity={0.15} 
-              blendFunction={BlendFunction.OVERLAY}
-            />
-            
-            {/* Vignette darkens the corners */}
-            <Vignette
-              offset={0.3}
-              darkness={0.7}
-              blendFunction={BlendFunction.NORMAL}
-            />
-            
-            {/* Scanlines for CRT effect */}
-            <Scanline
-              density={2.5}
-              opacity={0.05}
-              blendFunction={BlendFunction.OVERLAY}
-            />
-            
-            {/* Occasional glitch effect */}
-            <Glitch
-              delay={new Vector2(2, 5)}
-              duration={new Vector2(0.2, 0.4)}
-              strength={new Vector2(0.1, 0.4)}
-              mode={GlitchMode.SPORADIC}
-              active
-              ratio={0.6}
-            />
-          </EffectComposer>
         </Suspense>
+        
+        {/* 始终显示加载进度条，确保用户可以看到进度 */}
+        {loading && <LoadingScreen />}
       </Canvas>
     </div>
   );
